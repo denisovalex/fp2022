@@ -1,0 +1,5 @@
+(library
+ (name My_scheme_call_lib)
+ (public_name my_scheme_call.Lib)
+ (modules Ast Parser Interpreter)
+ (libraries base angstrom))

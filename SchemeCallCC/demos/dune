@@ -1,0 +1,11 @@
+(executable
+ (name demoParse)
+ (modules demoParse)
+ (public_name demoParse)
+ (libraries stdio my_scheme_call.Lib))
+
+(executable
+ (name demoInterpreter)
+ (modules demoInterpreter)
+ (public_name demoInterpreter)
+ (libraries stdio my_scheme_call.Lib))

@@ -1,0 +1,20 @@
+(lang dune 3.5)
+
+(name my_scheme_call)
+
+(generate_opam_files true)
+
+(source
+ (github denisovalex/fp2022))
+
+(authors "Denisov Alexey")
+
+(maintainers "Denisov Alexey")
+
+(license LGPL-3.0-or-later)
+
+(package
+ (name my_scheme_call)
+ (depends dune stdio base angstrom))
+
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/dune-files.html#dune-project
