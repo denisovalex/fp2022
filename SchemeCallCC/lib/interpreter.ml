@@ -13,8 +13,7 @@ type var =
   ; value : value
   }
 
-and context =
-  { vars : var list }
+and context = { vars : var list }
 
 and value =
   | VVoid
@@ -91,101 +90,99 @@ module Interpret = struct
              ctx.vars
       in
       return { vars }
-    | None -> 
+    | None ->
       let vars = var :: ctx.vars in
       return { vars }
   ;;
 
   let batch_eval : 'a. 'a list -> ('a -> (value, 'b) result) -> (value list, 'b) result =
-  fun (exprs : 'a list) (f : 'a -> (value, 'b) result) : (value list, 'b) result ->
+   fun (exprs : 'a list) (f : 'a -> (value, 'b) result) : (value list, 'b) result ->
     let rec helper = function
-     | [] -> return []
-     | hd :: tl ->
-       let* r = f hd in
-       let* t = helper tl in
-       return (List.cons r t)
+      | [] -> return []
+      | hd :: tl ->
+        let* r = f hd in
+        let* t = helper tl in
+        return (List.cons r t)
     in
     helper exprs
-  ;;
+ ;;
 
   let rec show_value = function
     | VVoid -> "#<void>"
     | VBool b -> Format.sprintf "%b" b
     | VInt d -> Format.sprintf "%d" d
-    | VList l -> 
-        let rec helper = function
-          | [ y ] -> show_value y
-          | hd :: tl -> Format.sprintf "%s %s" (show_value hd) (helper tl)
-          | _ -> ""
-        in
-        Format.sprintf "(%s)" @@ helper l
+    | VList l ->
+      let rec helper = function
+        | [ y ] -> show_value y
+        | hd :: tl -> Format.sprintf "%s %s" (show_value hd) (helper tl)
+        | _ -> ""
+      in
+      Format.sprintf "(%s)" @@ helper l
     | VString s -> Format.sprintf "%s" s
     | VLambda _ -> "#<lambda>"
     | VExprList _ -> "#<vexprlist>"
     | VVar _ -> "#<procedure>"
   ;;
-  
+
   (*___________________Do unary operation___________________*)
 
   let rec do_display arg =
     print_string (Format.sprintf "%s " (show_value arg));
     return VVoid
 
-  and do_un_op ctx op args = 
+  and do_un_op ctx op args =
     match args with
     | [ arg ] ->
       let* arg = eval_expr ctx arg in
       (match op, arg with
-      | "not", VBool x -> return (VBool (not x))
-      | "zero?", VInt x -> return (VBool (x = 0))
-      | "positive?", VInt x -> return (VBool (x > 0))
-      | "negative?", VInt x -> return (VBool (x < 0))
-      | "odd?", VInt x -> return (VBool (x mod 2 = 1))
-      | "even?", VInt x -> return (VBool (x mod 2 = 0))
-      | "abs", VInt x -> return (VInt (abs x))
-      | "boolean?", x -> 
-        (match x with
-        | VBool _ -> return (VBool true)
-        | _ -> return (VBool false))
-      | "integer?", x -> 
-        (match x with
-        | VInt _ -> return (VBool true)
-        | _ -> return (VBool false))
-      | "number?", x ->
-        (match x with
-        | VInt _ -> return (VBool true)
-        | _ -> return (VBool false))
-      | "procedure?", x ->
-        (match x with
-        | VVar v when List.mem v (bin_ops @ un_ops) -> return (VBool true)
-        | VLambda _ -> return (VBool true)
-        | _ -> return (VBool false))
-      | "pair?", x -> 
-        (match x with
-        | VList xs when List.length xs != 0 -> return (VBool true)
-        | _ -> return (VBool false))
-      | "list?", x -> 
-        (match x with
-        | VList _ -> return (VBool true)
-        | _ -> return (VBool false))
-      | "null?", x -> 
-        (match x with
-        | VList [] -> return (VBool true)
-        | _ -> return (VBool false))
-      | "car", VList l -> 
-        (match l with
-        | hd :: _ -> return hd
-        | [] -> Error (Format.sprintf "Exception in car: () is not a pair\n"))
-      | "cdr", VList l ->
-        (match l with
-        | _ :: tl -> return (VList tl)
-        | [] -> Error (Format.sprintf "Exception in cdr: () is not a pair\n"))
-      | "length", VList l -> return (VInt (List.length l))
-      | "display", v -> do_display v
-      | _ ->
-        Error (Format.sprintf "Invalid argument type of <%s> operator\n" op))
-    | _ ->
-      Error (Format.sprintf "Incorrect argument count of <%s> operator\n" op)
+       | "not", VBool x -> return (VBool (not x))
+       | "zero?", VInt x -> return (VBool (x = 0))
+       | "positive?", VInt x -> return (VBool (x > 0))
+       | "negative?", VInt x -> return (VBool (x < 0))
+       | "odd?", VInt x -> return (VBool (x mod 2 = 1))
+       | "even?", VInt x -> return (VBool (x mod 2 = 0))
+       | "abs", VInt x -> return (VInt (abs x))
+       | "boolean?", x ->
+         (match x with
+          | VBool _ -> return (VBool true)
+          | _ -> return (VBool false))
+       | "integer?", x ->
+         (match x with
+          | VInt _ -> return (VBool true)
+          | _ -> return (VBool false))
+       | "number?", x ->
+         (match x with
+          | VInt _ -> return (VBool true)
+          | _ -> return (VBool false))
+       | "procedure?", x ->
+         (match x with
+          | VVar v when List.mem v (bin_ops @ un_ops) -> return (VBool true)
+          | VLambda _ -> return (VBool true)
+          | _ -> return (VBool false))
+       | "pair?", x ->
+         (match x with
+          | VList xs when List.length xs != 0 -> return (VBool true)
+          | _ -> return (VBool false))
+       | "list?", x ->
+         (match x with
+          | VList _ -> return (VBool true)
+          | _ -> return (VBool false))
+       | "null?", x ->
+         (match x with
+          | VList [] -> return (VBool true)
+          | _ -> return (VBool false))
+       | "car", VList l ->
+         (match l with
+          | hd :: _ -> return hd
+          | [] -> Error (Format.sprintf "Exception in car: () is not a pair\n"))
+       | "cdr", VList l ->
+         (match l with
+          | _ :: tl -> return (VList tl)
+          | [] -> Error (Format.sprintf "Exception in cdr: () is not a pair\n"))
+       | "length", VList l -> return (VInt (List.length l))
+       | "display", v -> do_display v
+       | _ -> Error (Format.sprintf "Invalid argument type of <%s> operator\n" op))
+    | _ -> Error (Format.sprintf "Incorrect argument count of <%s> operator\n" op)
 
   (*___________________Do binary operation___________________*)
 
@@ -205,8 +202,8 @@ module Interpret = struct
     | hd :: tl ->
       let* head = eval_expr ctx hd in
       (match head with
-      | VInt head -> do_arithmetic ctx op tl head
-      | _ -> Error (Format.sprintf "Invalid argument type of arithmetic operator\n"))
+       | VInt head -> do_arithmetic ctx op tl head
+       | _ -> Error (Format.sprintf "Invalid argument type of arithmetic operator\n"))
 
   and do_comparison ctx op args =
     let rec helper first = function
@@ -265,7 +262,7 @@ module Interpret = struct
     | _ -> Error (Format.sprintf "Wrong operator <%s>\n" op)
 
   (*___________________Form evaluators___________________*)
-  
+
   and eval_var ctx id =
     match find_var ctx id with
     | Some var -> return var.value
@@ -276,7 +273,7 @@ module Interpret = struct
     | String s -> VString s
     | Bool b -> VBool b
 
-  and eval_func_call ctx func args = 
+  and eval_func_call ctx func args =
     let* op = eval_expr ctx func in
     match op with
     | VVar var when List.mem var un_ops -> do_un_op ctx var args
@@ -320,12 +317,12 @@ module Interpret = struct
     | If (cond, then_, else_) -> eval_if ctx cond then_ else_
     | Quote q -> return (eval_datum q)
     | Quasiquote q -> eval_quasiquote ctx q
-    
+
   and eval_def ctx id expr =
     let* value = eval_expr ctx expr in
     let* new_ctx = update_ctx ctx { id; value } in
     return new_ctx
-  
+
   and eval_form ctx = function
     | Def (id, expr) ->
       let* new_ctx = eval_def ctx id expr in
@@ -333,7 +330,7 @@ module Interpret = struct
     | Expr expr ->
       let* return_value = eval_expr ctx expr in
       return (ctx, return_value)
-  ;; 
+  ;;
 
   (*___________________Program interpretator___________________*)
 
