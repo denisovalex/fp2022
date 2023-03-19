@@ -121,7 +121,8 @@ let f =
     in
     choice
       [ (*lambda
-      ;*) if_
+      ;*)
+        if_
       ; func_call
       ; quote
       ; quasiquote
@@ -142,4 +143,4 @@ let scheme_parser =
        <* comment)
 ;;
 
-let parse str = parse_string ~consume:All scheme_parser str;;
+let parse str = parse_string ~consume:All scheme_parser str
