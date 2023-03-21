@@ -8,14 +8,7 @@ open Parser
 let ( let* ) m f = Result.bind m f
 let return = Result.ok
 
-type var =
-  { id : id
-  ; value : value
-  }
-
-and context = { vars : var list }
-
-and value =
+type value =
   | VVoid
   | VString of string
   | VInt of int
@@ -24,6 +17,13 @@ and value =
   | VList of value list
   | VExprList of expression list
   | VLambda of formals * definition list * expression list * context
+
+and context = { vars : var list }
+
+and var =
+  { id : id
+  ; value : value
+  }
 
 module Interpret = struct
   let bin_ops =

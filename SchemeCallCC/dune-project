@@ -12,5 +12,5 @@
 
 (package
  (name SchemeCallCC)
- (synopsis "Scheme pareser and interpreter")
+ (synopsis "Scheme parser and interpreter")
  (depends ocaml dune angstrom))

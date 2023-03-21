@@ -1,4 +1,4 @@
-(** Copyright 2022-2023, Denisov Alexey and contributors *)
+(** Copyright 2022-2023, Denisov Alexey type contributors *)
 
 (** SPDX-License-Identifier: LGPL-3.0-or-later *)
 
@@ -7,27 +7,27 @@ type const =
   | String of string
   | Bool of bool
 
-and datum =
-  | DConst of const
-  | DList of datum list
-  | DAbbr of prefix * datum
+type id = string
 
-and prefix =
+type formals =
+  | FormalList of id list
+  | Formal of id
+
+type prefix =
   | PQuote
   | PBackquote
   | PComma
 
-and quasiquote =
+type datum =
+  | DConst of const
+  | DList of datum list
+  | DAbbr of prefix * datum
+
+type quasiquote =
   | QConst of const
   | QDatum of datum
   | QList of quasiquote list
   | QUnquote of expression
-
-and id = string
-
-and formals =
-  | FormalList of id list
-  | Formal of id
 
 and expression =
   | Const of const
@@ -40,8 +40,8 @@ and expression =
 
 and definition = id * expression
 
-and form =
+type form =
   | Def of definition
   | Expr of expression
 
-and program = form list
+type program = form list
