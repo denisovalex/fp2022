@@ -236,14 +236,7 @@ module Interpret = struct
     | _ -> Error (Format.sprintf "Incorrect argument count of cons operator\n")
 
   and do_list ctx args =
-    let rec helper = function
-      | [] -> return []
-      | hd :: tl ->
-        let* hd = eval_expr ctx hd in
-        let* tl = helper tl in
-        return (hd :: tl)
-    in
-    let* l = helper args in
+    let* l = batch_eval args (eval_expr ctx) in
     return (VList l)
 
   and do_bin_op ctx op args =
