@@ -130,8 +130,7 @@ module Interpret = struct
     print_string (Format.sprintf "%s " (show_value arg));
     return VVoid
 
-  and do_un_op ctx op args =
-    match args with
+  and do_un_op ctx op = function
     | [ arg ] ->
       let* arg = eval_expr ctx arg in
       (match op, arg with
