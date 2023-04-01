@@ -3,3 +3,6 @@
  (modules demoInterpret)
  (public_name demoInterpret)
  (libraries SchemeCallCC.Lib stdio))
+
+(cram
+ (deps ./demoInterpret.exe))
