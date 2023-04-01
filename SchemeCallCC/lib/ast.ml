@@ -34,7 +34,7 @@ and expression =
   | Var of id
   | Quote of datum
   | Quasiquote of quasiquote
-  (*| Lambda of formals * definition list * expression list*)
+  | Lambda of formals * definition list * expression list
   | If of expression * expression * expression option
   | FuncCall of expression * expression list
 

@@ -59,7 +59,7 @@ let f =
       (both (token "define" *> id) (spaces *> f.expression f)
       >>| fun (id, expr) -> id, expr)
   in
-  let expression _ =
+  let expression f =
     fix
     @@ fun expr ->
     let bool_ = token "#t" *> return true <|> token "#f" *> return false in
@@ -106,7 +106,7 @@ let f =
           (If (condition, then_, None))
           (expr >>| fun else_ -> If (condition, then_, Some else_)))
     in
-    (*let formals =
+    let formals =
       parens (many id) >>| (fun x -> FormalList x) <|> (id >>| fun x -> Formal x)
     in
     let lambda =
@@ -115,14 +115,13 @@ let f =
         >>= fun formals ->
         many (f.definition f)
         >>= fun defs -> many1 expr >>| fun exprs -> Lambda (formals, defs, exprs))
-    in*)
+    in
     let func_call =
       parens (both expr (sep_by spaces expr) >>| fun (func, args) -> FuncCall (func, args))
     in
     choice
-      [ (*lambda
-      ;*)
-        if_
+      [ lambda
+      ; if_
       ; func_call
       ; quote
       ; quasiquote

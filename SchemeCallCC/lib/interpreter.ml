@@ -16,7 +16,7 @@ type value =
   | VVar of id
   | VList of value list
   | VExprList of expression list
-  | VLambda of formals * definition list * expression list * context
+  | VLambda of formals * definition list * expression list
 
 and context = { vars : var list }
 
@@ -253,6 +253,34 @@ module Interpret = struct
     | "list" -> do_list ctx args
     | _ -> Error (Format.sprintf "Wrong operator <%s>\n" op)
 
+  (*___________________Do lambda___________________*)
+
+  and do_lambda1 ctx formal defs exprs args =
+    match List.length args with
+    | 1 ->
+      let* new_ctx = eval_def ctx formal (List.hd args) in
+      let* new_ctx = eval_defs new_ctx defs in
+      do_lambda new_ctx exprs
+    | _ -> Error (Format.sprintf "Incorrect argument count of lambda operator\n")
+
+  and do_lambda2 ctx formals defs exprs args =
+    match List.compare_lengths formals args with
+    | 0 ->
+      let formals_linked_with_args = List.map2 (fun id expr -> id, expr) formals args in
+      let* new_ctx = eval_defs ctx formals_linked_with_args in
+      let* new_ctx = eval_defs new_ctx defs in
+      do_lambda new_ctx exprs
+    | _ -> Error (Format.sprintf "Incorrect argument count of lambda operator\n")
+
+  and do_lambda ctx exprs =
+    let rec helper acc = function
+      | hd :: tl ->
+        let* inner_expr = eval_expr ctx hd in
+        helper inner_expr tl
+      | [] -> return acc
+    in
+    helper VVoid exprs
+
   (*___________________Form evaluators___________________*)
 
   and eval_var ctx id =
@@ -270,8 +298,8 @@ module Interpret = struct
     match op with
     | VVar var when List.mem var un_ops -> do_un_op ctx var args
     | VVar var -> do_bin_op ctx var args
-    (*| VLambda (formals, defs, exprs, closure) ->
-      eval_lambda ctx closure formals defs exprs args *)
+    | VLambda (Formal formal, defs, exprs) -> do_lambda1 ctx formal defs exprs args
+    | VLambda (FormalList formals, defs, exprs) -> do_lambda2 ctx formals defs exprs args
     | _ -> Error (Format.sprintf "Wrong operator <%s>\n" (show_value op))
 
   and eval_if ctx cond then_ else_ =
@@ -305,10 +333,16 @@ module Interpret = struct
     | Var id -> eval_var ctx id
     | Const c -> return (eval_const c)
     | FuncCall (func, args) -> eval_func_call ctx func args
-    (*| Lambda (formals, defs, exprs) -> return (VLambda (formals, defs, exprs, ctx))*)
+    | Lambda (formals, defs, exprs) -> return (VLambda (formals, defs, exprs))
     | If (cond, then_, else_) -> eval_if ctx cond then_ else_
     | Quote q -> return (eval_datum q)
     | Quasiquote q -> eval_quasiquote ctx q
+
+  and eval_defs ctx = function
+    | [] -> return ctx
+    | (id, expr) :: tl ->
+      let* new_ctx = eval_def ctx id expr in
+      eval_defs new_ctx tl
 
   and eval_def ctx id expr =
     let* value = eval_expr ctx expr in
