@@ -44,3 +44,42 @@ Factorial
   > (display (factorial 4))
   > EOF
   1 2 6 24 
+
+Factorial via Fix
+  $ ./demoInterpret.exe <<-EOF
+  > (define Y
+  >   (lambda (f)
+  >     ((lambda (i) (i i))
+  >      (lambda (i)
+  >        (f (lambda (x)
+  >          (apply (i i) x)))))))
+  > (define factorial
+  >  (lambda (self)
+  >   (lambda (x)
+  >     (if (< x 1)
+  >       1
+  >       (* x (self (- x 1)))))))
+  > (display (Y factorial 1))
+  > (display (Y factorial 2))
+  > (display (Y factorial 3))
+  > (display (Y factorial 4))
+  > EOF
+
+  Incorrect argument count of lambda operator
+
+Quine 1: http://community.schemewiki.org/?quines
+  $ ./demoInterpret.exe <<-EOF
+  >  ((lambda (x)
+  >     (list x (list (quote quote) x)))
+  >    (quote
+  >       (lambda (x)
+  >         (list x (list (quote quote) x)))))
+  > EOF
+  
+Quine 2
+  $ ./demoInterpret.exe <<-EOF
+  >  ((lambda (q) ((lambda (x) `((lambda (q) ,((eval q) x)) ',q)) 
+  >             '(lambda (x) `((lambda (q) ,((eval q) x)) ',q)))) 
+  >   '(lambda (x) `(,x ',x))) 
+  > EOF
+  
