@@ -65,8 +65,6 @@ Factorial via Fix
   > (display (Y factorial 4))
   > EOF
 
-  Incorrect argument count of lambda operator
-
 Quine 1: http://community.schemewiki.org/?quines
   $ ./demoInterpret.exe <<-EOF
   >  ((lambda (x)
@@ -75,11 +73,10 @@ Quine 1: http://community.schemewiki.org/?quines
   >       (lambda (x)
   >         (list x (list (quote quote) x)))))
   > EOF
-  
+
 Quine 2
   $ ./demoInterpret.exe <<-EOF
-  >  ((lambda (q) ((lambda (x) `((lambda (q) ,((eval q) x)) ',q)) 
-  >             '(lambda (x) `((lambda (q) ,((eval q) x)) ',q)))) 
-  >   '(lambda (x) `(,x ',x))) 
+  >  ((lambda (q) ((lambda (x) \`((lambda (q) ,((eval q) x)) ',q)) 
+  >             '(lambda (x) \`((lambda (q) ,((eval q) x)) ',q)))) 
+  >   '(lambda (x) \`(,x ',x))) 
   > EOF
-  
