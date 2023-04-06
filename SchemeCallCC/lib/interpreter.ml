@@ -26,20 +26,7 @@ and var =
   }
 
 module Interpret = struct
-  let bin_ops =
-    [ "+"
-    ; "*"
-    ; "-"
-    ; "/"
-    ; "="
-    ; ">"
-    ; "<"
-    ; ">="
-    ; "<="
-    ; "cons"
-    ; "list"
-    ]
-  ;;
+  let bin_ops = [ "+"; "*"; "-"; "/"; "="; ">"; "<"; ">="; "<="; "cons"; "list" ]
 
   let un_ops =
     [ "not"
