@@ -81,7 +81,11 @@ let f =
         in
         spaces *> (dconst <|> dlist <|> dabbr))
     in
-    let quote = token "'" *> (parens datum <|> datum) >>| fun d -> Quote d in
+    let quote =
+      token "'" *> (parens datum <|> datum)
+      >>| (fun d -> Quote d)
+      <|> parens (token "quote" *> (parens datum <|> datum) >>| fun d -> Quote d)
+    in
     let unquote =
       spaces *> token "," *> choice [ (id >>| fun id -> Var id); expr ]
       >>| fun e -> QUnquote e
@@ -122,8 +126,8 @@ let f =
     choice
       [ lambda
       ; if_
-      ; func_call
       ; quote
+      ; func_call
       ; quasiquote
       ; (number >>| fun n -> Const (Int n))
       ; (bool_ >>| fun b -> Const (Bool b))
