@@ -38,9 +38,6 @@ module Interpret = struct
     ; "<="
     ; "cons"
     ; "list"
-    ; "append"
-    ; "apply"
-    ; "newline"
     ]
   ;;
 
@@ -69,12 +66,7 @@ module Interpret = struct
   (*___________________Helpers___________________*)
 
   let find_var ctx id =
-    List.find_map
-      (fun v ->
-        match v.id with
-        | v_id when String.equal v_id id -> Some v
-        | _ -> None)
-      ctx.vars
+    List.find_map (fun v -> if v.id = id then Some v else None) ctx.vars
   ;;
 
   let update_ctx ctx var =
